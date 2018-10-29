@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <header class="text-center">
+        <h1><strong>Weather App</strong> </h1>
+    </header>
+    <div class="container">
+        <div class="row">
+            <div class="form-group text-center">
+                <div class="col-xs-12">
+                    <label for="city-search">City Name:</label>
+                    <input type="text" id="location" class="form-   control" placeholder="Type a City">
+
+                    <button class="btn btn-primary" type="submit" id="submit">Get Weather</button>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <canvas id="icon1" width="128" height="128">
+                <p id="temp"></p>
+            </canvas>
+            <img src="./IMG/Thunderstormrain.jpeg" alt="">
+
+
+        </div>
+    </div>
+    <script src="https://rawgithub.com/darkskyapp/skycons/master/skycons.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC03m_QFiPqLsC9o0SvuJ-fEpL77UoPFu4&libraries=places,geometry"></script>
+    <script>
+            var url = "https://maps.googleapis.com/maps/api/geocode/json?address=";
+    
+            var API_KEY = "e44d0c7555531e717baeeea51085a8e9";
+    
+            var forecastURL = "https://api.forecast.io/forecast";
+    
+            var searchBox = new google.maps.places.SearchBox(document.querySelector("#location"));
+    
+            searchBox.addListener('places_changed', function () {
+                var locale = searchBox.getPlaces()[0];
+            });
+    
+    
+    
+            $(function () {
+    
+    
+                $("location").geocomplete();
+                $('#submit').click(function () {
+                    var params = document.getElementById('location').value;
+    
+                    var urlString = url + params;
+                    $.ajax({
+                        url: urlString,
+                        success: function (response) {
+    
+                            var lat = response.results[0].geometry.location.lat;
+                            var lng = response.results[0].geometry.location.lng;
+                            var coords = lat + ',' + lng;
+                            getWeather(coords);
+                        },
+                        error: function (error) {
+                            console.log('error');
+                        }
+                    });
+                })
+            })
+    
+            function getWeather(coords) {
+                var weatherUrl = forecastURL + API_KEY + '/' + coords + '?units=si';
+                $.getJSON(weatherUrl, function (forecast) {
+                    var current = forecast.currently.temperature;
+    
+    
+                    var skicons = forecast.currently.icon,
+                        time = forecast.currently.time,
+                        humidity = forecast.currently.humidity,
+                        summary = forecast.currently.summary;
+    
+    
+                    var skycons = new Skycons({ "color": "black" });
+    
+                    skycons.add("icon1", skicons);
+                    skycons.play();
+    
+                    //setting temperature
+                    $('temp').html(current);
+                });
+            }
+</script>
+</body>
+
+</html>
